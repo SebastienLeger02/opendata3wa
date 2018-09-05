@@ -8,17 +8,29 @@ html(lang="fr")
         title Forum
     body
         .form-style-5
-            form
+            form( method='post' action='/signup')
                 fieldset
                     legend
                         span.number 1
-                        |  Candidate Info
-                    input(type='text' name='field1' placeholder='Nom *')
-                    input(type='email' name='field2' placeholder='Email *')
+                        |  Inscription
+                    input(type='text' name='lastname' value=(user && user.lastname) placeholder='Nom *')
+
+                    //-p(class="valeur")
+                    //-p(class=(varname && varanme.name))
+
+                    input(type='text' name='firstname' value=(user && user.firstname) placeholder='Prénom *')                    
+                    input(type='email' name='email' value=(user && user.email) placeholder='Email *')
+                    input(type='password' name='pass' placeholder='Password *')
+                    input(type='password' name='pass_confirmation' placeholder='Confir Password *')                    
                     textarea(name='field3' placeholder='Quelque informations')
                 fieldset
                     legend
                         span.number 2
-                        |  Additional Info
-                    textarea(name='field3' placeholder='Tes études')
-                input(type='submit' value='Apply')
+                        |  Info suplémentaire
+                    textarea(name='field3' placeholder='Tes études...')
+                input(type='submit' value='Submit')
+
+        if errors
+                div.alert.alert-danger
+                    each error, index in errors
+                        | #{error} <br>

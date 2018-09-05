@@ -1,28 +1,27 @@
+require('dotenv').config() //Charge les variable d'environement
+
 const http = require('http');
 const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
-let app = express();
 app.set('view engine', 'pug');
 app.set('views', './views')
 
-// app.get('/', function (req, res) {
-//     res.send('Hello World!')
-//   })
 
- app.get('/', function (req, res) {
-    res.render('index');
-});
+app.use(express.static('public')); //meadleWear
+app.use(bodyParser.urlencoded({
+    extended: false
+}))
 
-app.get('/login', function (req, res) {
-    res.render('login');
-});
+require('./app/routes')(app);
 
-app.get('/signup', function (req, res) {
-    res.render('register');
-});
-
-app.use(express.static('public'));
-  
-  app.listen(3000, function () {
-    console.log('Server lancé sur le port 3000 !')
-})
+mongoose.connect(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}`, {
+        userNewUrlParser: true // Enlève le message erreur
+    })
+    .then(() => {
+        app.listen(3000, function () {
+            console.log('Server lancé sur le port 3000 !')
+        })
+    })

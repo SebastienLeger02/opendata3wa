@@ -4,10 +4,11 @@ html(lang="fr")
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
-        link(style type="text/css", href="css/style.css", rel="stylesheet" )
+        link( type="text/css", href="css/style.css", rel="stylesheet" )
+        link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.3.1/css/all.css", integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU", crossorigin="anonymous")
         title LOGIN
     body
-        form#login-form(action='#')
+        form#login-form(method='post' action='/login')
         .heading Connectez-vous !
         .left
             label(for='email') Email
@@ -21,8 +22,5 @@ html(lang="fr")
             input(type='submit' value='Login')
         .right
             .connect 
-            a.twitter(href='')
-            // <span class="fontawesome-twitter"></span>
-            i.fa.fa-twitter(aria-hidden='true')
-            br
-        
+                a.twitter(href='')
+                    i.fab.fa-twitter(aria-hidden='true')
