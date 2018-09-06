@@ -4,22 +4,22 @@ const hash = require('./../hash');
 
 // Définition du "Schéma" d'un utilisateur
 const UserSchema = mongoose.Schema({
-	firstname : { 
+    firstname: {
         type: String,
-        required: true 
+        required: true
     },
 
-	lastname : { 
+    lastname: {
         type: String,
-        required: true 
+        required: true
     },
-    
+
     // Validateur personnalisé qui vÃ©rifie le format d'une adresse e-mail.
     // Basé sur la documentation de mongoose : http://mongoosejs.com/docs/validation.html#custom-validators 
-    email : {
+    email: {
         type: String,
         validate: {
-            validator: function(mailValue) {
+            validator: function (mailValue) {
                 // c.f. http://emailregex.com/
                 const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return emailRegExp.test(mailValue);
@@ -28,31 +28,84 @@ const UserSchema = mongoose.Schema({
         }
     },
 
-    salt: { 
-        type: String,
-        required: true  
+    salt: {
+        type: String
     },
 
-    hash: { 
-        type: String, 
-        required: true 
+    hash: {
+        type: String
+    },
+
+    githubId: {
+        type: String
     }
 
 });
 
-UserSchema.statics.signup = function(firstname, lastname, email, pass, pass_confirmation) {
+UserSchema.statics.signup = function (firstname, lastname, email, pass, pass_confirmation) {
 
-   return hash(pass).then(data => {
-        return this.create({
-            firstname : firstname,
-            lastname : lastname,
-            email : email,
-            salt : data.salt,
-            hash : data.hash
+    // Vérification des champs de mot de passe
+    const pass_errors = []
+
+    if (pass.trim() === '')
+        pass_errors.push('Le champs "mot de passe" est obligatoire')
+
+    if (pass_confirmation.trim() === '')
+        pass_errors.push('Le champs "confirmation de mot de passe" est obligatoire')
+
+    if (pass_errors.length === 0 && pass.trim() !== pass_confirmation.trim())
+        pass_errors.push('Les mots de passe doivent être identiques')
+
+    if (pass_errors.length > 0)
+        return Promise.reject(pass_errors)
+
+    /*
+        Insertion en base, en utilisant la méthode .create() de d'un Model mongoose
+        c.f. http://mongoosejs.com/docs/api.html#create_create
+
+        Cette méthode renvoie une Promesse JS. Avec l'instruction 'return', on renvoie donc
+        la promesse comme valeur de 'UserSchema.statics.signup'
+    */
+
+    return this.findOne({email: email})
+        .then(user => {
+            if (user)
+                return Promise.reject(new Error(`Cette adresse email est déjà utilisée (${user.email})`));
         })
-    })
+        .then(() => hash(pass))
+        .then(({salt,hash}) => {
+            return this.create({
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                salt: data.salt,
+                hash: data.hash
+            }) 
+        }).catch(err => {
+                // Fabrication d'un tableau de messages d'erreur (extraits de l'objet 'ValidationError' renvoyé par Mongoose)
+                if (err.errors)
+                    throw Object.keys(err.errors).map(field => err.errors[field].message);
+                
+                throw [err.message ? err.message : err];
+            })
+        };
+        
+        /*
+            Ajout de la méthode permettant de vérifier un mot de passe
+        */
+        
+UserSchema.statics.verifyPass = function(passwordInClear, userObject) {
+    const userSalt = userObject.salt;
+    const userHash = userObject.hash;
     
+    return hash(passwordInClear, userSalt).then((data) => {
+        if (data.hash === userHash) {
+            return Promise.resolve(userObject)
+        } else {
+            return Promise.reject(new Error('Mot de passe invalide!'))
+        }
+    });
 }
-
+                    
 // Export du Modele mongoose representant un objet User
-module.exports = mongoose.model('User', UserSchema);
+ module.exports = mongoose.model('User', UserSchema);

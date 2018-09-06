@@ -4,8 +4,31 @@ html(lang="fr")
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        link(href="https://fonts.googleapis.com/css?family=Raleway:400,400i,700,800",rel="stylesheet")
         link(style type="text/css", href="css/style.css", rel="stylesheet" )        
         title Lien header
     body
+        h1
+        input#burger(type='checkbox')
+        label(for='burger')
+            span.spanBurger
+            span.spanBurger
+            span.spanBurger
+        nav
+            ul
+                li.listeMenu
+                    a.ButtonMenuMain(href='/')|Accueil
+                if user
+                    li|Vous etes connecté en tant que #{user.firstname} #{user.lastname}
+                else    
+                    li.listeMenu 
+                        a.ButtonMenuMain(href='/login')|Connexion        
+                    li.listeMenu 
+                        a.ButtonMenuMain(href='/signup')|Inscription  
 
-    block content
+        each messages, kind in flashMessage
+            div.alert.alert-success.alert-(kind)
+                each message in messages 
+                    | #{message}
+   
+        block content
