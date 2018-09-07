@@ -11,8 +11,15 @@ block content
             br
             input#pass(type='password' name='password')
             br
-            input(type='submit' value='Login')
+            input(method='post' type='submit' value='Login')
+        br    
+        .heading Vous pouvez vous connecter aussi avec :    
+        br
         .right
             .connect 
-                a.twitter(href='')
+                a.twitter(href='#')
                     i.fab.fa-twitter(aria-hidden='true')
+                a.github(href='auth/github/callback')
+                    i.fab.fa-github(aria-hidden='true')
+                a.google-plus(href='#')
+                    i.fab.fa-google-plus(aria-hidden='true')

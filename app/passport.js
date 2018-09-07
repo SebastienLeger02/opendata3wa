@@ -4,6 +4,23 @@ const GithubStrategy = require('passport-github').Strategy;
 
 module.exports = function (passport) {
 
+     /*
+        Serialization/Désérialisation de l'objet 'user'
+        c.f. http://www.passportjs.org/docs/configure/#sessions
+    */
+
+   passport.serializeUser((user, done) => {
+        done(null, user.id);
+    });
+
+    passport.deserializeUser((id, done) => {
+        User.findById(id, (err, user) => {
+            done(err, user);
+        });
+    });
+
+    // Stratégie Locale
+    // ----
 
     const localStrategyConfig = {
         usernameField: 'email', // en fonction du name="" du champs input type text
@@ -42,4 +59,18 @@ module.exports = function (passport) {
                     done(null, false, {message: err.message});
             });
     }));
+    // Stratégie Github
+    // ----
+    
+    passport.use(new GithubStrategy({
+    	clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: `http://localhost:3000/auth/github/callback`
+    },
+        function(token, tokenSecret, profile, cb) {
+        	
+            //console.log('PROFILE GITHUB', profile)
+            
+        }
+    ));
 }

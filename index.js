@@ -14,6 +14,7 @@ app.set('views', './views')
 
 
 app.use(express.static('public')); //meadleWear
+//http://expressjs.com/fr/starter/static-files.html
 app.use(bodyParser.urlencoded({
     extended: false
 }))
@@ -37,15 +38,15 @@ app.use((req, res, next) => { // Middlewear
 app.use(passport.initialize())
 app.use(passport.session())
 
-
-require('./app/routes')(app, passport);
 require('./app/passport')(passport);
+require('./app/routes')(app, passport);
+
 
 mongoose.connect(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}`, {
         userNewUrlParser: true // Enlève le message erreur
     })
     .then(() => {
-        app.listen(3000, function () {
+        app.listen(3000, 'localhost', () => {
             console.log('Server lancé sur le port 3000 !')
         })
     })

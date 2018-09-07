@@ -16,12 +16,8 @@ module.exports = function (app, passport) {
         res.render('login');
     });
 
-    app.get('/signup', function (req, res) {
-        res.render('register');
-    });
-
     // Lorsqu'on tente de se connecter, c'est le middleware de passport qui prend la main, avec la stratégie "locale" (configurée dans ./passport.js )
-    app.post('/login.pug', passport.authenticate('local', {
+    app.post('/login', passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/login',
         badRequestMessage: 'Identifiants non valides!',
@@ -30,6 +26,21 @@ module.exports = function (app, passport) {
             message: 'Connexion réussie. Bienvenue !'
         }
     }));
+
+    app.get('/auth/github', passport.authenticate('github'));
+    app.get('/auth/github/callback', passport.authenticate('github', {
+    	successRedirect: '/',
+        failureRedirect: '/login',
+        failureFlash: true,
+        successFlash: { message: 'Connexion réussie avec Github. Bienvenue !' }
+    }));
+
+    /**
+     * Route "/signup" : Page d'inscription
+     */
+    app.get('/signup', function (req, res) {
+        res.render('register');
+    });
 
     app.post('/signup', (req, res) => {
         //console.log(req.body)
@@ -44,9 +55,9 @@ module.exports = function (app, passport) {
                 req.flash('success', 'Vous etes bien inscrit.')
                 res.redirect('/') //redirection vers la page accueil
             })
-            .catch(err => {
-                res.render("register.pug", {
-                    err,
+            .catch(errors => {
+                res.render('register', {
+                    errors,
                     user: req.body
                 })
             })
