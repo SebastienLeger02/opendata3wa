@@ -51,7 +51,6 @@ module.exports = function (app, passport) {
                 req.body.pass,
                 req.body.pass_confirmation
             ).then(() => {
-
                 req.flash('success', 'Vous etes bien inscrit.')
                 res.redirect('/') //redirection vers la page accueil
             })

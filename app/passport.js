@@ -69,8 +69,9 @@ module.exports = function (passport) {
     },
         function(token, tokenSecret, profile, cb) {
         	
-            //console.log('PROFILE GITHUB', profile)
-            
+            User.signupViaGithub(profile)
+                .then(user => cb(null,user))
+                .catch(err => cb(err,false));
         }
     ));
 }
